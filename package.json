@@ -1,0 +1,7 @@
+{
+  "name": "vagacerta-checkout",
+  "version": "1.0.0",
+  "dependencies": {
+    "stripe": "^18.2.1"
+  }
+}

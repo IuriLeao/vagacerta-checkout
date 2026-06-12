@@ -1,0 +1,91 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <title>VagaCerta - Pagamento</title>
+  <script src="https://js.stripe.com/v3/"></script>
+  <style>
+    body{font-family:Arial,sans-serif;background:#f8fafc;margin:0;padding:30px;color:#0f172a}
+    .box{max-width:1050px;margin:auto;display:grid;grid-template-columns:1fr 360px;gap:24px;align-items:start}
+    .card{background:white;border:1px solid #e5e7eb;border-radius:14px;padding:24px;box-shadow:0 8px 20px rgba(15,23,42,.06)}
+    .logo{text-align:center;font-weight:900;font-size:26px;margin-bottom:28px;color:#2563eb}
+    h1{margin:0 0 8px;font-size:28px}
+    h2{margin:0 0 16px;font-size:22px}
+    .muted{color:#64748b;font-size:14px;margin-bottom:20px}
+    .price{font-size:46px;color:#16a34a;font-weight:900;margin:10px 0}
+    .linha{border-top:1px solid #e5e7eb;margin:18px 0}
+    .item{margin:11px 0;font-size:15px}
+    .safe{font-size:13px;color:#64748b;margin-top:18px;line-height:1.4}
+    #checkout{min-height:420px}
+    @media(max-width:768px){
+      body{padding:14px}
+      .box{grid-template-columns:1fr}
+      .logo{margin-top:10px}
+    }
+  </style>
+</head>
+<body>
+
+<div class="logo">VagaCerta</div>
+
+<div class="box">
+  <div class="card">
+    <h1>Finalizar acesso</h1>
+    <p class="muted">Preencha os dados de pagamento para ativar seu teste gratuito.</p>
+    <div id="checkout">Carregando pagamento seguro...</div>
+  </div>
+
+  <div class="card">
+    <h2>Resumo do pedido</h2>
+    <strong>VagaCerta Premium</strong>
+
+    <div class="price">R$ 0,00</div>
+    <p>Hoje você não paga nada.</p>
+    <p>Após 7 dias: <strong>R$ 27,90/mês</strong></p>
+
+    <div class="linha"></div>
+
+    <div class="item">✓ Acesso a todas as vagas da sua região</div>
+    <div class="item">✓ Candidaturas ilimitadas</div>
+    <div class="item">✓ Currículo enviado direto ao RH</div>
+    <div class="item">✓ Alertas de novas vagas</div>
+    <div class="item">✓ Cancele quando quiser</div>
+
+    <div class="linha"></div>
+
+    <p class="safe">🔒 Pagamento seguro processado pela Stripe. Sem fidelidade e sem taxas ocultas.</p>
+  </div>
+</div>
+
+<script>
+const stripe = Stripe("pk_test_51TdYIBIJJ6KVNZQVfkVYnU5xLS2CaSkjRHfhR8jH1eGgSBxfd5ZIJQb6StRxPAxllMxuHXLuRfnMQ5LDMyLtGWuH00Lktr95LV");
+
+async function iniciarCheckout() {
+  try {
+    const response = await fetch("/api/create-checkout-session", {
+      method: "POST"
+    });
+
+    const data = await response.json();
+
+    if (data.error) {
+      document.getElementById("checkout").innerText = data.error;
+      return;
+    }
+
+    const checkout = await stripe.initEmbeddedCheckout({
+      clientSecret: data.clientSecret
+    });
+
+    checkout.mount("#checkout");
+  } catch (erro) {
+    document.getElementById("checkout").innerText =
+      "Erro ao carregar pagamento. Tente novamente.";
+  }
+}
+
+iniciarCheckout();
+</script>
+
+</body>
+</html>
