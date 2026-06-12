@@ -9,6 +9,7 @@ module.exports = async (req, res) => {
 
   try {
     const session = await stripe.checkout.sessions.create({
+      locale: "pt",
       ui_mode: "embedded",
       mode: "subscription",
       line_items: [
